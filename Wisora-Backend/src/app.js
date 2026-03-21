@@ -42,6 +42,12 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// Render Health Check
+app.get("/", (req, res) => {
+  res.status(200).send("Wisora API is running.");
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/questions", questionRoutes);
