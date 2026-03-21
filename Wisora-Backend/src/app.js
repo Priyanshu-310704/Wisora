@@ -20,7 +20,18 @@ const app = express();
 app.use(express.json({ limit: "10mb" }));
 app.use(helmet());
 app.use(morgan("dev"));
-const allowedOrigins = JSON.parse(process.env.CLIENT_URL);
+let allowedOrigins = [];
+try {
+  const clientUrlEnv = process.env.CLIENT_URL || "";
+  if (clientUrlEnv.startsWith("[")) {
+    allowedOrigins = JSON.parse(clientUrlEnv);
+  } else {
+    // Fallback if they didn't use an array (e.g. "https://domain.com, http://localhost")
+    allowedOrigins = clientUrlEnv.split(",").map(url => url.trim());
+  }
+} catch (error) {
+  console.error("Failed to parse CLIENT_URL:", error);
+}
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
